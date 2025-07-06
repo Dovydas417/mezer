@@ -1,1 +1,185 @@
-We see you
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mezer - Covert Operations Interface</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom CSS for Inter font and general body styling */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #000000; /* Pure black background */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            color: #d8b4fe; /* Default light purple text color */
+            overflow: hidden; /* Prevent scrollbars from particle canvas */
+            position: relative; /* For absolute positioning of canvas */
+        }
+
+        /* Canvas for particles - positioned to cover the whole screen */
+        #particle-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0; /* Ensure it's behind the content */
+        }
+
+        /* Container for the main content, above the canvas */
+        .content-container {
+            position: relative; /* Ensure content is above particles */
+            z-index: 1;
+        }
+
+        /* Custom glow for the title (more pronounced) */
+        .title-glow {
+            text-shadow: 0 0 15px rgba(168, 85, 247, 0.9), /* Stronger purple glow */
+                         0 0 30px rgba(168, 85, 247, 0.7),
+                         0 0 45px rgba(168, 85, 247, 0.5);
+        }
+
+        /* Subtle glow for all other text */
+        .text-glow {
+            text-shadow: 0 0 5px rgba(216, 180, 254, 0.6), /* Light purple glow */
+                         0 0 10px rgba(216, 180, 254, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <!-- Canvas for background particles -->
+    <canvas id="particle-canvas"></canvas>
+
+    <div class="content-container bg-transparent p-8 md:p-12 rounded-xl max-w-3xl w-full text-center">
+        <!-- Main Title -->
+        <h1 class="text-6xl md:text-7xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-purple-500 to-fuchsia-600 mb-6 animate-pulse title-glow">
+            Mezer
+        </h1>
+
+        <!-- Subtitle/Tagline -->
+        <p class="text-xl md:text-2xl text-purple-300 mb-8 font-light text-glow">
+            Your Gateway to Advanced Data Reconnaissance
+        </p>
+
+        <!-- Description Section -->
+        <div class="text-left text-purple-400 leading-relaxed space-y-4 bg-gray-900 bg-opacity-30 p-6 rounded-2xl border border-purple-800 text-glow">
+            <p>
+                Welcome to the <span class="font-semibold text-purple-200">Mezer Interface</span> | This platform is meticulously crafted for precision data analysis and strategic information gathering.
+            </p>
+            <p>
+                Our secure protocols ensure discretion and integrity in every operation | Uncover hidden patterns and visualize complex relationships | Designed for the discerning operative who demands clarity and efficiency.
+            </p>
+            <p>
+                Empowering your insights, one byte at a time | Ready to explore the depths of information? Let's begin.
+            </p>
+        </div>
+
+        <!-- Call to Action Button -->
+        <button id="activateButton" class="mt-10 px-8 py-4 bg-gradient-to-r from-purple-700 to-fuchsia-800 text-white font-bold text-lg rounded-full shadow-lg hover:from-purple-800 hover:to-fuchsia-900 transition transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-purple-600 focus:ring-opacity-50">
+            Activate Protocol
+        </button>
+    </div>
+
+    <script>
+        // --- Button Click Handler ---
+        const activateButton = document.getElementById('activateButton');
+        activateButton.addEventListener('click', () => {
+            window.open('https://gofile.io/d/2F8aRH', '_blank');
+        });
+
+        // --- Particle System ---
+        const canvas = document.getElementById('particle-canvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+        const numParticles = 100; // Number of particles
+
+        // Function to set canvas dimensions
+        function setCanvasSize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+
+        // Particle constructor
+        function Particle(x, y) {
+            this.x = x;
+            this.y = y;
+            this.radius = Math.random() * 1.5 + 0.5; // Small random radius
+            this.color = `rgba(255, 255, 255, ${Math.random() * 0.4 + 0.2})`; // Semi-transparent white
+            this.speedX = (Math.random() - 0.5) * 0.5; // Slight horizontal movement
+            this.speedY = Math.random() * 0.5 + 0.1; // Slow downward movement (like snow/dust)
+        }
+
+        // Draw particle
+        Particle.prototype.draw = function() {
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
+            ctx.fillStyle = this.color;
+            ctx.fill();
+        };
+
+        // Update particle position
+        Particle.prototype.update = function() {
+            this.x += this.speedX;
+            this.y += this.speedY;
+
+            // If particle goes off screen, reset its position to the top
+            if (this.y > canvas.height + this.radius) {
+                this.y = -this.radius;
+                this.x = Math.random() * canvas.width;
+            }
+            // If particle goes off horizontal bounds, wrap it around
+            if (this.x < -this.radius) {
+                this.x = canvas.width + this.radius;
+            } else if (this.x > canvas.width + this.radius) {
+                this.x = -this.radius;
+            }
+        };
+
+        // Initialize particles
+        function initParticles() {
+            particles = [];
+            for (let i = 0; i < numParticles; i++) {
+                // Distribute particles randomly across the screen initially
+                particles.push(new Particle(Math.random() * canvas.width, Math.random() * canvas.height));
+            }
+        }
+
+        // Animation loop
+        function animateParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear canvas
+            for (let i = 0; i < particles.length; i++) {
+                particles[i].update();
+                particles[i].draw();
+            }
+            requestAnimationFrame(animateParticles); // Loop animation
+        }
+
+        // Event listeners for canvas resizing and initial setup
+        window.addEventListener('resize', setCanvasSize);
+        window.onload = function() {
+            setCanvasSize(); // Set initial size
+            initParticles();  // Initialize particles
+            animateParticles(); // Start animation
+        };
+
+        // --- Audio Playback Note ---
+        /*
+        * Note: Direct embedding and autoplay of Spotify tracks is not possible due to Spotify's
+        * embedding policies and browser autoplay restrictions for media without user interaction.
+        * If you have a direct URL to an audio file (e.g., .mp3, .wav), you could use:
+        *
+        * <audio id="background-audio" src="YOUR_AUDIO_FILE_URL.mp3" loop autoplay></audio>
+        *
+        * And then in JavaScript, you might need to trigger play on user interaction:
+        * document.addEventListener('click', () => {
+        * document.getElementById('background-audio').play();
+        * }, { once: true });
+        */
+    </script>
+</body>
+</html>
